@@ -1,11 +1,11 @@
+import * as dotenv from 'dotenv';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as dotenv from 'dotenv';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   dotenv.config();
-
   const app = await NestFactory.create(AppModule);
 
   // Swagger configuration
@@ -13,11 +13,13 @@ async function bootstrap() {
     .setTitle('JSULIMA API')
     .setDescription('API documentation for JSULIMA backend')
     .setVersion('1.0')
-    .addBearerAuth() // If you're using JWT
+    .addBearerAuth() 
     .build();
 
+  app.useGlobalPipes(new ValidationPipe());
+  app.enableCors(); 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document); // Swagger UI at /api
+  SwaggerModule.setup('api', app, document); 
 
   await app.listen(process.env.PORT ?? 7000);
 }
