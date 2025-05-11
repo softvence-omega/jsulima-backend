@@ -8,13 +8,15 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ProfileService {
   constructor(private prisma: PrismaService) {}
 
-  async getMyProfile(userId: string) {
+  async getMyProfile(userId: any) {
     if (!userId) {
       throw new NotFoundException('User ID is required');
     }
   
+    console.log('Fetching profile for userId:', userId.sub);  // Debugging log
+  
     const profile = await this.prisma.profile.findUnique({
-      where: { userId: userId },
+      where: { userId: userId.sub },  // Ensure correct field is used
     });
   
     if (!profile) {
@@ -23,17 +25,4 @@ export class ProfileService {
   
     return profile;
   }
-
-//   async updateMyProfile(userId: number, data: any) {
-//     const profile = await this.prisma.profile.upsert({
-//       where: { userId },
-//       update: data,
-//       create: {
-//         ...data,
-//         user: { connect: { id: userId } },
-//       },
-//     });
-  
-//     return profile;
-//   }
 }
