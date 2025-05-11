@@ -16,10 +16,12 @@ datasource db {
 model User {
   id          String   @id @default(uuid())
   fullName    String?
+  userName    String?
   email       String   @unique
   image       String?
   password    String
   phoneNumber String
+  country     String?
   profile     Profile?
   role        Role
   createdAt   DateTime @default(now())
