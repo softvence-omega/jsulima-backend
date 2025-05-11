@@ -15,17 +15,20 @@ datasource db {
 
 model User {
   id          String   @id @default(uuid())
-  fullName    String?
-  userName    String?
+  fullName    String
+  userName    String?  @unique
   email       String   @unique
   image       String?
   password    String
-  phoneNumber String
+  phoneNumber String?
   country     String?
   profile     Profile?
-  role        Role
+  role        Role     @default(USER)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  subscription Subscription[]
+  promoCodes   PromoCode[]
 }
 
 model Profile {
@@ -35,6 +38,39 @@ model Profile {
   company String?
   userId  String  @unique
   user    User    @relation(fields: [userId], references: [id])
+}
+
+model Subscription {
+  id        String             @id @default(uuid())
+  user      User               @relation(fields: [userId], references: [id])
+  userId    String
+  price     Float
+  planType  PlanType
+  status    SubscriptionStatus @default(ACTIVE)
+  startDate DateTime           @default(now())
+  endDate   DateTime
+  isActive  Boolean            @default(true)
+}
+
+enum PlanType {
+  MONTHLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  CANCELLED
+  EXPIRED
+}
+
+model PromoCode {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  discount  Float
+  expiresAt DateTime
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?
 }
 
 enum Role {
