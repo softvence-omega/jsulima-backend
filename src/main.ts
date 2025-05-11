@@ -13,7 +13,16 @@ async function bootstrap() {
     .setTitle('JSULIMA API')
     .setDescription('API documentation for JSULIMA backend')
     .setVersion('1.0')
-    .addBearerAuth() 
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        in: 'header',
+      },
+      'access-token',
+    ) 
     .build();
 
   app.useGlobalPipes(new ValidationPipe());

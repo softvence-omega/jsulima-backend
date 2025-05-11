@@ -1,36 +1,54 @@
 import {
-    Controller,
-    UseGuards,
-    Patch,
-    Body,
-    Req,
-    Post,
-    UseInterceptors,
-    UploadedFile,
-  } from '@nestjs/common';
-  import { UserService } from './user.service';
+  Controller,
+  UseGuards,
+  Patch,
+  Body,
+  Req,
+  Post,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
+import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { UpdateUserDto } from './update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { cloudinaryStorage } from 'src/config/coudinary.storage';
-  
-  @Controller('users')
-  @UseGuards(JwtAuthGuard)
-  export class UserController {
-    constructor(private readonly userService: UserService) {}
-  
-    @Patch('update-profile')
-    async updateProfile(@Req() req, @Body() dto: UpdateUserDto) {
-      const userId = req.user.sub;
-      return this.userService.updateProfile(userId, dto);
-    }
+import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { cloudinaryStorage } from 'src/config/cloudinary.storage';
 
-    @Post('upload-profile-image')
-@UseInterceptors(FileInterceptor('file', { storage: cloudinaryStorage }))
-async uploadProfileImage(@UploadedFile() file: Express.Multer.File, @Req() req) {
-  const userId = req.user.sub;
-  const imageUrl = file.path;
-  return this.userService.updateProfileImage(userId, imageUrl);
-}
+@Controller('users')
+@UseGuards(JwtAuthGuard)
+export class UserController {
+  constructor(private readonly userService: UserService) {}
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @Patch('update-profile')
+  async updateProfile(@Req() req, @Body() dto: UpdateUserDto) {
+    const userId = req.user.sub;
+    return this.userService.updateProfile(userId, dto);
   }
-  
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiConsumes('multipart/form-data')
+  @Post('upload-profile-image')
+  @UseInterceptors(FileInterceptor('file', { storage: cloudinaryStorage }))
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async uploadProfileImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req,
+  ) {
+    const userId = req.user.sub;
+    const imageUrl = file.path;
+    return this.userService.updateProfileImage(userId, imageUrl);
+  }
+}
