@@ -10,7 +10,7 @@ export class UserService {
 
   async createUser(dto: RegisterDto) {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-  
+
     const user = await this.prisma.user.create({
       data: {
         fullName: dto.fullName,
@@ -20,35 +20,54 @@ export class UserService {
         role: 'USER',
       },
     });
-  
 
     await this.prisma.profile.create({
       data: {
-        name: dto.fullName, 
+        name: dto.fullName,
+        userName: dto.userName,
         phone: dto.phoneNumber,
+        image: dto.image,
+        country: dto.country,
         userId: user.id,
       },
     });
-  
+
     return user;
   }
-  
 
   async findByEmail(email: string) {
     return this.prisma.user.findUnique({ where: { email } });
   }
 
-
   async updateProfile(userId: string, dto: UpdateUserDto) {
-    return this.prisma.user.update({
+    // Split the DTO to separate user and profile fields
+    const { fullName, phoneNumber, country, userName, image } = dto;
+
+    // Update user model fields
+    const updatedUser = await this.prisma.user.update({
       where: { id: userId },
-      data: { ...dto },
+      data: {
+        ...(fullName && { fullName }),
+        ...(phoneNumber && { phoneNumber }),
+      },
     });
+
+    // Update profile model fields
+    const updatedProfile = await this.prisma.profile.update({
+      where: { userId }, // Because Profile.userId is unique
+      data: {
+        ...(country && { country }),
+        ...(userName && { userName }),
+        ...(image && { image }),
+      },
+    });
+
+    return { ...updatedUser, profile: updatedProfile };
   }
 
   async updateProfileImage(userId: string, imageUrl: string) {
-    return this.prisma.user.update({
-      where: { id: userId },
+    return this.prisma.profile.update({
+      where: { userId },
       data: { image: imageUrl },
     });
   }
