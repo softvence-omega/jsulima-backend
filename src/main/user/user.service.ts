@@ -10,7 +10,7 @@ export class UserService {
 
   async createUser(dto: RegisterDto) {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-
+  
     const user = await this.prisma.user.create({
       data: {
         fullName: dto.fullName,
@@ -20,9 +20,19 @@ export class UserService {
         role: 'USER',
       },
     });
+  
 
+    await this.prisma.profile.create({
+      data: {
+        name: dto.fullName, 
+        phone: dto.phoneNumber,
+        userId: user.id,
+      },
+    });
+  
     return user;
   }
+  
 
   async findByEmail(email: string) {
     return this.prisma.user.findUnique({ where: { email } });

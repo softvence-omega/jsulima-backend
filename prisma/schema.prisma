@@ -35,7 +35,7 @@ model Profile {
   id      String  @id @default(uuid())
   name    String
   phone   String?
-  company String?
+  country String?
   userId  String  @unique
   user    User    @relation(fields: [userId], references: [id])
 }
@@ -45,6 +45,7 @@ model Subscription {
   user      User               @relation(fields: [userId], references: [id])
   userId    String
   price     Float
+  features  String[]
   planType  PlanType
   status    SubscriptionStatus @default(ACTIVE)
   startDate DateTime           @default(now())
