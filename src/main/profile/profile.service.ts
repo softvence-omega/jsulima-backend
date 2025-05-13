@@ -16,7 +16,7 @@ export class ProfileService {
     console.log('Fetching profile for userId:', userId.sub);  // Debugging log
   
     const profile = await this.prisma.profile.findUnique({
-      where: { userId: userId.sub },  // Ensure correct field is used
+      where: { userId: userId.sub },
     });
   
     if (!profile) {
