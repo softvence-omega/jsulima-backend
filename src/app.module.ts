@@ -14,6 +14,7 @@ import { AuthController } from './main/auth/auth.controller';
 import { JwtStrategy } from './main/auth/strategies/jwt.strategy';
 import { PlanModule } from './main/plan/plan.module';
 import { PromoCodeModule } from './main/promo-code/promo-code.module';
+import { SubscriptionModule } from './main/subscription/subscription.module';
 
 
 @Module({
@@ -27,7 +28,8 @@ import { PromoCodeModule } from './main/promo-code/promo-code.module';
     }),
     PlanModule,
     PromoCodeModule,
-    PrismaModule
+    PrismaModule,
+    SubscriptionModule
   ],
   controllers: [AppController],
   providers: [AppService, AuthService, JwtStrategy, PrismaService],
