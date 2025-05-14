@@ -5,6 +5,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
+import * as bodyParser from 'body-parser';
 
 async function seedAdmin() {
   const prisma = new PrismaClient();
@@ -54,6 +55,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors(); 
+  app.use('/webhook', bodyParser.raw({ type: 'application/json' }));
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document); 
 

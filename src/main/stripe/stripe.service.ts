@@ -1,20 +1,9 @@
-// import { Injectable } from '@nestjs/common';
-
-// @Injectable()
-// export class BillingService {}
-
-
-
-
-
-
-
 import { Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class BillingService {
+export class StripeService {
   private stripe: Stripe;
 
   constructor(private configService: ConfigService) {
@@ -27,6 +16,7 @@ export class BillingService {
         apiVersion: '2025-04-30.basil',
     });
   }
+
   async createCheckoutSession({
     userId,
     planId,

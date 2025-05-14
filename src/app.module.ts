@@ -18,6 +18,9 @@ import { SubscriptionModule } from './main/subscription/subscription.module';
 import { DashboardService } from './main/dashboard/dashboard.service';
 import { DashboardController } from './main/dashboard/dashboard.controller';
 import { DashboardModule } from './main/dashboard/dashboard.module';
+
+import { StripeService } from './main/stripe/stripe.service';
+import { StripeModule } from './main/stripe/stripe.module';
 import { BillingModule } from './main/billing/billing.module';
 
 
@@ -35,9 +38,10 @@ import { BillingModule } from './main/billing/billing.module';
     PrismaModule,
     SubscriptionModule,
     DashboardModule,
-    BillingModule
+    BillingModule,
+    StripeModule
   ],
   controllers: [AppController, DashboardController],
-  providers: [AppService, AuthService, JwtStrategy, PrismaService, DashboardService],
+  providers: [AppService, AuthService, JwtStrategy, PrismaService, DashboardService, StripeService],
 })
 export class AppModule {}
