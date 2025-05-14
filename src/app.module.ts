@@ -18,6 +18,7 @@ import { SubscriptionModule } from './main/subscription/subscription.module';
 import { DashboardService } from './main/dashboard/dashboard.service';
 import { DashboardController } from './main/dashboard/dashboard.controller';
 import { DashboardModule } from './main/dashboard/dashboard.module';
+import { BillingModule } from './main/billing/billing.module';
 
 
 @Module({
@@ -33,7 +34,8 @@ import { DashboardModule } from './main/dashboard/dashboard.module';
     PromoCodeModule,
     PrismaModule,
     SubscriptionModule,
-    DashboardModule
+    DashboardModule,
+    BillingModule
   ],
   controllers: [AppController, DashboardController],
   providers: [AppService, AuthService, JwtStrategy, PrismaService, DashboardService],
