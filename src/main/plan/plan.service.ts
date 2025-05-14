@@ -1,4 +1,55 @@
-import { Injectable } from '@nestjs/common';
+// import { Injectable } from '@nestjs/common';
+// import { PrismaService } from 'src/prisma/prisma.service';
+// import { CreatePlanDto, UpdatePlanDto } from './create-plan.dto';
+
+
+// @Injectable()
+// export class PlanService {
+//   constructor(private prisma: PrismaService) {}
+
+//   create(dto: CreatePlanDto) {
+//     return this.prisma.plan.create({ data: dto });
+//   }
+
+//   findAll() {
+//     return this.prisma.plan.findMany({
+//       include: {
+//         subscriptions: {
+//           include: {
+//             user: true,
+//             appliedPromoCode: true,
+//           },
+//         },
+//       },
+//     });
+//   }
+  
+//   findOne(id: string) {
+//     return this.prisma.plan.findUnique({
+//       where: { id },
+//       include: {
+//         subscriptions: {
+//           include: {
+//             user: true,
+//             appliedPromoCode: true,
+//           },
+//         },
+//       },
+//     });
+//   }
+
+//   update(id: string, dto: UpdatePlanDto) {
+//     return this.prisma.plan.update({ where: { id }, data: dto });
+//   }
+
+//   remove(id: string) {
+//     return this.prisma.plan.delete({ where: { id } });
+//   }
+// }
+
+
+
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePlanDto, UpdatePlanDto } from './create-plan.dto';
 
@@ -7,42 +58,39 @@ import { CreatePlanDto, UpdatePlanDto } from './create-plan.dto';
 export class PlanService {
   constructor(private prisma: PrismaService) {}
 
-  create(dto: CreatePlanDto) {
+  async create(dto: CreatePlanDto) {
     return this.prisma.plan.create({ data: dto });
   }
 
-  findAll() {
+  async findAll() {
     return this.prisma.plan.findMany({
       include: {
-        subscriptions: {
-          include: {
-            user: true,
-            appliedPromoCode: true,
-          },
-        },
+        subscriptions: true,
       },
     });
   }
-  
-  findOne(id: string) {
-    return this.prisma.plan.findUnique({
+
+  async findOne(id: string) {
+    const plan = await this.prisma.plan.findUnique({
       where: { id },
-      include: {
-        subscriptions: {
-          include: {
-            user: true,
-            appliedPromoCode: true,
-          },
-        },
-      },
+      include: { subscriptions: true },
+    });
+
+    if (!plan) throw new NotFoundException('Plan not found');
+    return plan;
+  }
+
+  async update(id: string, dto: UpdatePlanDto) {
+    return this.prisma.plan.update({
+      where: { id },
+      data: dto,
     });
   }
 
-  update(id: string, dto: UpdatePlanDto) {
-    return this.prisma.plan.update({ where: { id }, data: dto });
-  }
-
-  remove(id: string) {
-    return this.prisma.plan.delete({ where: { id } });
+  async remove(id: string) {
+    return this.prisma.plan.delete({
+      where: { id },
+    });
   }
 }
+
