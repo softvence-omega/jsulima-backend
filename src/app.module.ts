@@ -15,6 +15,9 @@ import { JwtStrategy } from './main/auth/strategies/jwt.strategy';
 import { PlanModule } from './main/plan/plan.module';
 import { PromoCodeModule } from './main/promo-code/promo-code.module';
 import { SubscriptionModule } from './main/subscription/subscription.module';
+import { DashboardService } from './main/dashboard/dashboard.service';
+import { DashboardController } from './main/dashboard/dashboard.controller';
+import { DashboardModule } from './main/dashboard/dashboard.module';
 
 
 @Module({
@@ -29,9 +32,10 @@ import { SubscriptionModule } from './main/subscription/subscription.module';
     PlanModule,
     PromoCodeModule,
     PrismaModule,
-    SubscriptionModule
+    SubscriptionModule,
+    DashboardModule
   ],
-  controllers: [AppController],
-  providers: [AppService, AuthService, JwtStrategy, PrismaService],
+  controllers: [AppController, DashboardController],
+  providers: [AppService, AuthService, JwtStrategy, PrismaService, DashboardService],
 })
 export class AppModule {}
