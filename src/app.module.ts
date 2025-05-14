@@ -14,12 +14,11 @@ import { AuthController } from './main/auth/auth.controller';
 import { JwtStrategy } from './main/auth/strategies/jwt.strategy';
 import { PlanModule } from './main/plan/plan.module';
 import { PromoCodeModule } from './main/promo-code/promo-code.module';
-import { PromoCodeModule } from './main/promo-code/promo-code.module';
+
 
 @Module({
   imports: [
     PassportModule,
-    PrismaModule,
     AuthModule,
     UserModule,
     ProfileModule,
@@ -28,9 +27,9 @@ import { PromoCodeModule } from './main/promo-code/promo-code.module';
     }),
     PlanModule,
     PromoCodeModule,
-    
+    PrismaModule
   ],
   controllers: [AppController],
-  providers: [AppService, AuthService, JwtStrategy],
+  providers: [AppService, AuthService, JwtStrategy, PrismaService],
 })
 export class AppModule {}
