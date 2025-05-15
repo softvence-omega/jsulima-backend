@@ -22,6 +22,7 @@ import { DashboardModule } from './main/dashboard/dashboard.module';
 import { StripeService } from './main/stripe/stripe.service';
 import { StripeModule } from './main/stripe/stripe.module';
 import { BillingModule } from './main/billing/billing.module';
+import { StripeController } from './main/stripe/stripe.controller';
 
 
 @Module({
@@ -41,7 +42,7 @@ import { BillingModule } from './main/billing/billing.module';
     BillingModule,
     StripeModule
   ],
-  controllers: [AppController, DashboardController],
+  controllers: [AppController, DashboardController, StripeController],
   providers: [AppService, AuthService, JwtStrategy, PrismaService, DashboardService, StripeService],
 })
 export class AppModule {}

@@ -55,7 +55,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors(); 
-  app.use('/webhook', bodyParser.raw({ type: 'application/json' }));
+  app.use('/webhook/stripe', bodyParser.raw({ type: 'application/json' }));
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document); 
 

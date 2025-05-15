@@ -52,7 +52,7 @@ export class StripeService {
         planId,
       },
     });
-
+    console.log(session)
     return session.url;
   }
 

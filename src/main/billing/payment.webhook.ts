@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { StripeService } from '../stripe/stripe.service';
 
-@Controller('webhook')
+@Controller('webhook/stripe')
 export class WebhookController {
   constructor(
     private stripeService: StripeService,
