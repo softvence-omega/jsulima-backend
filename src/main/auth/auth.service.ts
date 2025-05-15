@@ -164,7 +164,6 @@ export class AuthService {
       where: { id: userId },
       data: { password: hashedPassword },
     });
-  
     return { message: 'Password changed successfully' };
   }
 }

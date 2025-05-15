@@ -3,9 +3,14 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './register.dto';
 import { LoginDto } from './login.dto';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ChangePasswordDto, ForgotPasswordDto, ResetPasswordDto } from './forget-password.dto';
+import {
+  ChangePasswordDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+} from './forget-password.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { RequestWithUser } from 'src/common/types/request-with-user';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -41,13 +46,13 @@ export class AuthController {
     return this.authService.resetPassword(dto.token, dto.newPassword);
   }
 
-  @UseGuards(AuthGuard('jwt'))
-@Patch('change-password')
-@ApiBearerAuth()
-async changePassword(
-  @Req() req: RequestWithUser,
-  @Body() dto: ChangePasswordDto
-) {
-  return this.authService.changePassword(req.user.id, dto);
-}
+  @UseGuards(JwtAuthGuard)
+  @Patch('change-password')
+  @ApiBearerAuth('access-token')
+  async changePassword(
+    @Req() req: RequestWithUser,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.authService.changePassword(req.user.id, dto);
+  }
 }
