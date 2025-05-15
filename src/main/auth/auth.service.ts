@@ -25,7 +25,7 @@ export class AuthService {
       console.error('JWT_SECRET is not defined!');
       throw new Error('JWT_SECRET is not defined in the environment variables.');
     }
-    console.log('JWT_SECRET inside AuthService:', jwtSecret);
+    // console.log('JWT_SECRET inside AuthService:', jwtSecret);
   }
 
 

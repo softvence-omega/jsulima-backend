@@ -20,16 +20,16 @@ export class ProfileController {
   @ApiBearerAuth('access-token')
   @Get('me')
   getMyProfile(@Req() req: any) {
-    console.log('User ID:', req?.user);
+    // console.log('User ID:', req?.user);
     return this.profileService.getMyProfile(req.user);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Post('me')
-  getMe(@Req() req) {
-    return req.user;
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
+  // @Post('me')
+  // getMe(@Req() req) {
+  //   return req.user;
+  // }
 
   //   @Patch('me')
   //   updateMyProfile(@Req() req: any, @Body() body: any) {
