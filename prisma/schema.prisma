@@ -30,6 +30,13 @@ model User {
   resetTokenExpiry DateTime? // expiry time for reset token
 }
 
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+}
+
 model Profile {
   id       String  @id @default(uuid())
   name     String

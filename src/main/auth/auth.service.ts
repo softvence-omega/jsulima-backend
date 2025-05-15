@@ -12,7 +12,7 @@ import { RegisterDto } from './register.dto';
 import { LoginDto } from './login.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
-import { randomBytes } from 'crypto';
+import * as crypto from 'crypto';
 import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
@@ -96,22 +96,23 @@ export class AuthService {
     }
   }
 
-  async forgotPassword(email: string): Promise<string> {
+  async forgotPassword(email: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user) throw new NotFoundException('User not found');
 
-    const token = randomBytes(32).toString('hex');
-    const expiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+    if (!user) throw new BadRequestException('User not found');
 
-    await this.prisma.user.update({
-      where: { email },
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await this.prisma.passwordResetToken.create({
       data: {
-        resetToken: token,
-        resetTokenExpiry: expiry,
+        email,
+        token,
+        expiresAt: expires,
       },
     });
 
-    const resetLink = `https://your-app.com/reset-password?token=${token}&email=${email}`;
+    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -119,30 +120,30 @@ export class AuthService {
       html: `<p>Click the link to reset your password:</p><a href="${resetLink}">${resetLink}</a>`,
     });
 
-    return 'Password reset link sent to your email.';
+    return { message: 'Password reset email sent' };
   }
 
-  async resetPassword(token: string, email: string, newPassword: string): Promise<string> {
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user || !user.resetToken || user.resetToken !== token) {
-      throw new BadRequestException('Invalid or expired token');
-    }
+  async resetPassword(token: string, newPassword: string) {
+    const resetRecord = await this.prisma.passwordResetToken.findUnique({
+      where: { token },
+    });
 
-    if (!user.resetTokenExpiry || user.resetTokenExpiry < new Date()) {
-      throw new BadRequestException('Token has expired');
+    if (
+      !resetRecord ||
+      new Date() > new Date(resetRecord.expiresAt)
+    ) {
+      throw new BadRequestException('Token is invalid or expired');
     }
 
     const hashed = await bcrypt.hash(newPassword, 12);
 
     await this.prisma.user.update({
-      where: { email },
-      data: {
-        password: hashed,
-        resetToken: null,
-        resetTokenExpiry: null,
-      },
+      where: { email: resetRecord.email },
+      data: { password: hashed },
     });
 
-    return 'Password has been reset successfully.';
+    await this.prisma.passwordResetToken.delete({ where: { token } });
+
+    return { message: 'Password has been reset successfully' };
   }
 }
