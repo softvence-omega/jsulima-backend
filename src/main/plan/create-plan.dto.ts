@@ -50,9 +50,9 @@ export class CreatePlanDto {
   @IsBoolean()
   isActive: boolean;
 
-  @ApiProperty({ example: 'user_12345', description: 'ID of the user who owns this plan' })
-  @IsString()
-  userId: string;
+  // @ApiProperty({ example: 'user_12345', description: 'ID of the user who owns this plan' })
+  // @IsString()
+  // userId: string;
 }
 
 export class UpdatePlanDto extends PartialType(CreatePlanDto) {}

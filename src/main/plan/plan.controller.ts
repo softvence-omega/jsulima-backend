@@ -41,6 +41,7 @@ import { PlanService } from './plan.service';
 import { CreatePlanDto, UpdatePlanDto } from './create-plan.dto';
 
 
+
 @Controller('plans')
 export class PlanController {
   constructor(private readonly planService: PlanService) {}
