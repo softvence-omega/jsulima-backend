@@ -72,6 +72,7 @@ export class BillingService {
     if (!endpointSecret) {
       throw new Error('STRIPE_WEBHOOK_SECRET is not defined in environment variables');
     }
+    console.log(signature)
   
     return this.stripe.webhooks.constructEvent(payload, signature, endpointSecret);
   }
