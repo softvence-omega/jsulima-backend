@@ -9,11 +9,13 @@ export class StripeService {
   constructor(private configService: ConfigService) {
     const stripeSecretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
     if (!stripeSecretKey) {
-      throw new Error('STRIPE_SECRET_KEY is not defined in the environment variables');
+      throw new Error(
+        'STRIPE_SECRET_KEY is not defined in the environment variables',
+      );
     }
-  
+
     this.stripe = new Stripe(stripeSecretKey, {
-        apiVersion: '2025-04-30.basil',
+      apiVersion: '2025-04-30.basil',
     });
   }
 
@@ -52,17 +54,50 @@ export class StripeService {
         planId,
       },
     });
-    console.log(session)
+    console.log(session);
     return session.url;
   }
 
   async constructWebhookEvent(payload: Buffer, signature: string) {
-    const endpointSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
-  
+    const endpointSecret = this.configService.get<string>(
+      'STRIPE_WEBHOOK_SECRET',
+    );
+
     if (!endpointSecret) {
-      throw new Error('STRIPE_WEBHOOK_SECRET is not defined in environment variables');
+      throw new Error(
+        'STRIPE_WEBHOOK_SECRET is not defined in environment variables',
+      );
     }
+
+    return this.stripe.webhooks.constructEvent(
+      payload,
+      signature,
+      endpointSecret,
+    );
+  }
+
+  async getPaymentIntent(
+    paymentIntentId: string,
+  ): Promise<
+    Stripe.PaymentIntent & {
+      charges: Stripe.ApiList<
+        Stripe.Charge & { invoice?: string | Stripe.Invoice }
+      >;
+    }
+  > {
+    const response = await this.stripe.paymentIntents.retrieve(paymentIntentId, {
+      expand: ['charges.data.invoice'],
+    });
   
-    return this.stripe.webhooks.constructEvent(payload, signature, endpointSecret);
+    return response as unknown as Stripe.PaymentIntent & {
+      charges: Stripe.ApiList<
+        Stripe.Charge & { invoice?: string | Stripe.Invoice }
+      >;
+    };
+  }
+  
+
+  async getInvoice(invoiceId: string): Promise<Stripe.Invoice> {
+    return await this.stripe.invoices.retrieve(invoiceId);
   }
 }

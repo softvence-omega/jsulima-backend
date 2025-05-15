@@ -20,7 +20,7 @@ export class ProfileController {
   @ApiBearerAuth('access-token')
   @Get('me')
   getMyProfile(@Req() req: any) {
-    console.log('User ID:', req?.user);
+    // console.log('User ID:', req?.user);
     return this.profileService.getMyProfile(req.user);
   }
 

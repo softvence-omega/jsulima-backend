@@ -13,7 +13,7 @@ export class ProfileService {
       throw new NotFoundException('User ID is required');
     }
   
-    console.log('Fetching profile for userId:', userId.sub);  // Debugging log
+    // console.log('Fetching profile for userId:', userId.sub);  // Debugging log
   
     const profile = await this.prisma.profile.findUnique({
       where: { userId: userId.sub },
