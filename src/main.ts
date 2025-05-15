@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
 import * as bodyParser from 'body-parser';
 
+
 async function seedAdmin() {
   const prisma = new PrismaClient();
   const adminEmail = 'admin@jsulima.com';

@@ -23,7 +23,10 @@ export class StripeController {
     let event: Stripe.Event;
 
     try {
-      event = await this.stripeService.constructWebhookEvent(request.body, signature);
+      event = await this.stripeService.constructWebhookEvent(
+        request.body,
+        signature,
+      );
       console.log('✅ Stripe Webhook Event:', event.type);
     } catch (err) {
       console.error('❌ Webhook signature verification failed.', err.message);
@@ -49,22 +52,22 @@ export class StripeController {
       });
 
       if (existing) {
-        console.log('⚠️ Subscription already exists for this paymentIntentId. Skipping creation.');
+        console.log(
+          '⚠️ Subscription already exists for this paymentIntentId. Skipping creation.',
+        );
         return response.status(200).send('Duplicate event handled');
       }
 
       // Fetch payment intent to get invoice URL
       let invoiceUrl: string | null = null;
       try {
-        const paymentIntent = await this.stripeService.getPaymentIntent(paymentIntentId);
+        const paymentIntent =
+          await this.stripeService.getPaymentIntent(paymentIntentId);
         const charge = paymentIntent?.charges?.data?.[0];
-if (
-  charge?.invoice &&
-  typeof charge.invoice === 'string'
-) {
-  const invoice = await this.stripeService.getInvoice(charge.invoice);
-  invoiceUrl = invoice?.hosted_invoice_url || null;
-}
+        if (charge?.invoice && typeof charge.invoice === 'string') {
+          const invoice = await this.stripeService.getInvoice(charge.invoice);
+          invoiceUrl = invoice?.hosted_invoice_url || null;
+        }
       } catch (err) {
         console.error('❌ Failed to fetch invoice:', err.message);
       }
