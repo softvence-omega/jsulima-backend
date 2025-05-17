@@ -10,6 +10,7 @@ import {
 import { SubscriptionService } from './subscription.service';
 import { CreateSubscriptionDto } from './create-subscription.dto';
 import { UpdateSubscriptionDto } from './update-subscription.dto';
+import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('subscriptions')
 export class SubscriptionController {
@@ -28,6 +29,16 @@ export class SubscriptionController {
   @Get('user/:userId')
   findByUser(@Param('userId') userId: string) {
     return this.service.findByUser(userId);
+  }
+
+  @Get('revenue')
+  @ApiOperation({ summary: 'Get total subscription revenue' })
+  async getTotalRevenue() {
+    const revenue = await this.service.getTotalRevenue();
+    return {
+      message: 'Total subscription revenue fetched successfully',
+      totalRevenue: revenue,
+    };
   }
 
   @Patch(':id')
