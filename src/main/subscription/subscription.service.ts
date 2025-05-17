@@ -47,6 +47,28 @@ export class SubscriptionService {
     });
   }
 
+  async getTotalRevenue(): Promise<number> {
+    const paidSubscriptions = await this.prisma.userSubscription.findMany({
+      where: {
+        paymentStatus: 'PAID', // Filter only paid subscriptions
+      },
+      select: {
+        plan: {
+          select: {
+            price: true,
+          },
+        },
+      },
+    });
+  
+    const total = paidSubscriptions.reduce((sum, sub) => {
+      return sum + sub.plan.price;
+    }, 0);
+  
+    return Number(total.toFixed(2));
+  }
+  
+
   async update(id: string, dto: UpdateSubscriptionDto) {
     return this.prisma.userSubscription.update({
       where: { id },
