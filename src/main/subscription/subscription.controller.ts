@@ -10,7 +10,8 @@ import {
 import { SubscriptionService } from './subscription.service';
 import { CreateSubscriptionDto } from './create-subscription.dto';
 import { UpdateSubscriptionDto } from './update-subscription.dto';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { RevenueDto } from './revenue.dto';
 
 @Controller('subscriptions')
 export class SubscriptionController {
@@ -32,8 +33,9 @@ export class SubscriptionController {
   }
 
   @Get('revenue')
-  @ApiOperation({ summary: 'Get total subscription revenue' })
+  @ApiOperation({ summary: "Get total subscription revenue & current month's total revenue" })
   @Get('revenue')
+  @ApiOkResponse({ type: RevenueDto })
   async getRevenue() {
     return this.service.getRevenueStats();
   }
