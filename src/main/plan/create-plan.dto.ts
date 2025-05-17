@@ -42,13 +42,13 @@ export class CreatePlanDto {
   @IsEnum(PlanStatus)
   status: PlanStatus;
 
-  @ApiProperty({ example: '2025-12-31T23:59:59.000Z', description: 'Expiration date of the plan (ISO format)' })
-  @IsDateString()
-  endDate: string;
+  // @ApiProperty({ example: '2025-12-31T23:59:59.000Z', description: 'Expiration date of the plan (ISO format)' })
+  // @IsDateString()
+  // endDate: string;
 
-  @ApiProperty({ example: true, description: 'Indicates whether the plan is currently active' })
-  @IsBoolean()
-  isActive: boolean;
+  // @ApiProperty({ example: true, description: 'Indicates whether the plan is currently active' })
+  // @IsBoolean()
+  // isActive: boolean;
 
   // @ApiProperty({ example: 'user_12345', description: 'ID of the user who owns this plan' })
   // @IsString()
