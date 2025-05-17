@@ -33,12 +33,9 @@ export class SubscriptionController {
 
   @Get('revenue')
   @ApiOperation({ summary: 'Get total subscription revenue' })
-  async getTotalRevenue() {
-    const revenue = await this.service.getTotalRevenue();
-    return {
-      message: 'Total subscription revenue fetched successfully',
-      totalRevenue: revenue,
-    };
+  @Get('revenue')
+  async getRevenue() {
+    return this.service.getRevenueStats();
   }
 
   @Patch(':id')

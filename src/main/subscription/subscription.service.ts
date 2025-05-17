@@ -47,10 +47,19 @@ export class SubscriptionService {
     });
   }
 
-  async getTotalRevenue(): Promise<number> {
-    const paidSubscriptions = await this.prisma.userSubscription.findMany({
+  async getRevenueStats() {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+    // Current month revenue
+    const currentMonthSubs = await this.prisma.userSubscription.findMany({
       where: {
-        paymentStatus: 'PAID', // Filter only paid subscriptions
+        paymentStatus: 'PAID',
+        paidAt: {
+          gte: startOfMonth,
+          lt: endOfMonth,
+        },
       },
       select: {
         plan: {
@@ -60,14 +69,30 @@ export class SubscriptionService {
         },
       },
     });
-  
-    const total = paidSubscriptions.reduce((sum, sub) => {
-      return sum + sub.plan.price;
-    }, 0);
-  
-    return Number(total.toFixed(2));
+
+    const currentMonthRevenue = currentMonthSubs.reduce((sum, sub) => sum + sub.plan.price, 0);
+
+    // All-time revenue
+    const allTimeSubs = await this.prisma.userSubscription.findMany({
+      where: {
+        paymentStatus: 'PAID',
+      },
+      select: {
+        plan: {
+          select: {
+            price: true,
+          },
+        },
+      },
+    });
+
+    const allTimeRevenue = allTimeSubs.reduce((sum, sub) => sum + sub.plan.price, 0);
+
+    return {
+      currentMonthRevenue: Number(currentMonthRevenue.toFixed(2)),
+      allTimeRevenue: Number(allTimeRevenue.toFixed(2)),
+    };
   }
-  
 
   async update(id: string, dto: UpdateSubscriptionDto) {
     return this.prisma.userSubscription.update({
