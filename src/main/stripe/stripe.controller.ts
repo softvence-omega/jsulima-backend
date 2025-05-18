@@ -29,7 +29,7 @@ export class StripeController {
       );
       console.log('✅ Stripe Webhook Event:', event.type);
     } catch (err) {
-      console.error('❌ Webhook signature verification failed.', err.message);
+      console.error('Webhook signature verification failed.', err.message);
       return response.status(400).send(`Webhook Error: ${err.message}`);
     }
 
@@ -42,7 +42,7 @@ export class StripeController {
       const paymentIntentId = session.payment_intent as string;
 
       if (!userId || !planId || !paymentIntentId) {
-        console.warn('❗ Missing metadata in session. Skipping.');
+        console.warn('Missing metadata in session. Skipping.');
         return response.status(400).send('Missing metadata');
       }
 
@@ -53,7 +53,7 @@ export class StripeController {
 
       if (existing) {
         console.log(
-          '⚠️ Subscription already exists for this paymentIntentId. Skipping creation.',
+          'Subscription already exists for this paymentIntentId. Skipping creation.',
         );
         return response.status(200).send('Duplicate event handled');
       }
@@ -69,7 +69,7 @@ export class StripeController {
           invoiceUrl = invoice?.hosted_invoice_url || null;
         }
       } catch (err) {
-        console.error('❌ Failed to fetch invoice:', err.message);
+        console.error('Failed to fetch invoice:', err.message);
       }
 
       // Calculate dynamic end date for subscription (30 days from now)
