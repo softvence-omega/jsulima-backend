@@ -1,3 +1,8 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -13,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
   }
 
   async validate(payload: any) {
-    // console.log('JWT payload:', payload);
+    console.log('JWT payload:', payload);
     return { sub: payload.sub, role: payload.role, id: payload.sub }; // ✅ this matches your controller
   }
 }

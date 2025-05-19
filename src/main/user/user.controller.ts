@@ -1,3 +1,8 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Controller,
   UseGuards,
@@ -24,7 +29,7 @@ export class UserController {
   @ApiBearerAuth('access-token')
   @Patch('update-profile')
   async updateProfile(@Req() req, @Body() dto: UpdateUserDto) {
-    const userId = req.user.sub;
+    const userId = req.user.id;
     return this.userService.updateProfile(userId, dto);
   }
   @UseGuards(JwtAuthGuard)
@@ -47,7 +52,8 @@ export class UserController {
     @UploadedFile() file: Express.Multer.File,
     @Req() req,
   ) {
-    const userId = req.user.sub;
+    console.log('Decoded JWT user:', req.user);
+    const userId = req.user.id;
     const imageUrl = file.path;
     return this.userService.updateProfileImage(userId, imageUrl);
   }
