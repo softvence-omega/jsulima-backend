@@ -14,18 +14,27 @@ datasource db {
 }
 
 model User {
-  id            String             @id @default(uuid())
-  fullName      String
-  email         String             @unique
-  password      String
-  phoneNumber   String?
-  profile       Profile?
-  role          Role               @default(USER)
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  isSubscribed  Boolean?
-  subscriptions UserSubscription[] // User can have multiple subscriptions over time
-  promoCodes    PromoCode[] // User-created promo codes (if needed)
+  id               String             @id @default(uuid())
+  fullName         String
+  email            String             @unique
+  password         String
+  phoneNumber      String?
+  profile          Profile?
+  role             Role               @default(USER)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  isSubscribed     Boolean?
+  subscriptions    UserSubscription[] // User can have multiple subscriptions over time
+  promoCodes       PromoCode[] // User-created promo codes (if needed)
+  resetToken       String? // token for password reset
+  resetTokenExpiry DateTime? // expiry time for reset token
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
 }
 
 model Profile {
@@ -47,10 +56,10 @@ model Plan {
   features      String[]
   planType      PlanType
   status        PlanStatus         @default(ACTIVE)
-  isActive      Boolean            @default(true)
+  // isActive      Boolean            @default(true)
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
-  endDate       DateTime? // <- add this
+  // endDate       DateTime? // <- add this
   subscriptions UserSubscription[] // Who subscribed to this plan
 }
 
@@ -92,8 +101,8 @@ enum PlanType {
 enum PlanStatus {
   ACTIVE
   INACTIVE
-  CANCELLED
-  EXPIRED
+  // CANCELLED
+  // EXPIRED
 }
 
 enum PaymentStatus {

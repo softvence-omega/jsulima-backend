@@ -47,11 +47,11 @@ export class DashboardService {
     // Handle topPlan type explicitly
     let topPlan: { id: string; isActive: boolean; title: string; description: string; price: number; features: string[]; planType: PlanType; status: PlanStatus; createdAt: Date; updatedAt: Date } | null = null;
 
-    if (mostPopularPlan.length > 0) {
-      topPlan = await this.prisma.plan.findUnique({
-        where: { id: mostPopularPlan[0].planId },
-      });
-    }
+    // if (mostPopularPlan.length > 0) {
+    //   topPlan = await this.prisma.plan.findUnique({
+    //     where: { id: mostPopularPlan[0].planId },
+    //   });
+    // }
 
     return {
       totalUsers,

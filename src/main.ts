@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
 import * as bodyParser from 'body-parser';
 
+
 async function seedAdmin() {
   const prisma = new PrismaClient();
   const adminEmail = 'admin@jsulima.com';
@@ -59,7 +60,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT ?? 7000);
+  await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
 

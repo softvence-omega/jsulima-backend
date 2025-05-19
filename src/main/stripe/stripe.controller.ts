@@ -23,10 +23,13 @@ export class StripeController {
     let event: Stripe.Event;
 
     try {
-      event = await this.stripeService.constructWebhookEvent(request.body, signature);
+      event = await this.stripeService.constructWebhookEvent(
+        request.body,
+        signature,
+      );
       console.log('✅ Stripe Webhook Event:', event.type);
     } catch (err) {
-      console.error('❌ Webhook signature verification failed.', err.message);
+      console.error('Webhook signature verification failed.', err.message);
       return response.status(400).send(`Webhook Error: ${err.message}`);
     }
 
@@ -39,7 +42,7 @@ export class StripeController {
       const paymentIntentId = session.payment_intent as string;
 
       if (!userId || !planId || !paymentIntentId) {
-        console.warn('❗ Missing metadata in session. Skipping.');
+        console.warn('Missing metadata in session. Skipping.');
         return response.status(400).send('Missing metadata');
       }
 
@@ -49,24 +52,24 @@ export class StripeController {
       });
 
       if (existing) {
-        console.log('⚠️ Subscription already exists for this paymentIntentId. Skipping creation.');
+        console.log(
+          'Subscription already exists for this paymentIntentId. Skipping creation.',
+        );
         return response.status(200).send('Duplicate event handled');
       }
 
       // Fetch payment intent to get invoice URL
       let invoiceUrl: string | null = null;
       try {
-        const paymentIntent = await this.stripeService.getPaymentIntent(paymentIntentId);
+        const paymentIntent =
+          await this.stripeService.getPaymentIntent(paymentIntentId);
         const charge = paymentIntent?.charges?.data?.[0];
-if (
-  charge?.invoice &&
-  typeof charge.invoice === 'string'
-) {
-  const invoice = await this.stripeService.getInvoice(charge.invoice);
-  invoiceUrl = invoice?.hosted_invoice_url || null;
-}
+        if (charge?.invoice && typeof charge.invoice === 'string') {
+          const invoice = await this.stripeService.getInvoice(charge.invoice);
+          invoiceUrl = invoice?.hosted_invoice_url || null;
+        }
       } catch (err) {
-        console.error('❌ Failed to fetch invoice:', err.message);
+        console.error('Failed to fetch invoice:', err.message);
       }
 
       // Calculate dynamic end date for subscription (30 days from now)

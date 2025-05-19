@@ -7,6 +7,7 @@ import {
   Post,
   UseInterceptors,
   UploadedFile,
+  Get,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
@@ -19,6 +20,12 @@ import { cloudinaryStorage } from 'src/config/cloudinary.storage';
 @UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @ApiBearerAuth('access-token') 
+  @Get('all')
+  async getAllUsers() {
+    return this.userService.findAll();
+  }
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')

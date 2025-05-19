@@ -35,6 +35,28 @@ export class UserService {
     return user;
   }
 
+  async findAll() {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        phoneNumber: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        // you can include profile if you want:
+        profile: {
+          select: {
+            userName: true,
+            image: true,
+            country: true,
+          },
+        },
+      },
+    });
+  }
+
   async findByEmail(email: string) {
     return this.prisma.user.findUnique({ where: { email } });
   }
@@ -71,4 +93,6 @@ export class UserService {
       data: { image: imageUrl },
     });
   }
+
+
 }
