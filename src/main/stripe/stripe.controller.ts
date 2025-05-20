@@ -75,19 +75,25 @@ export class StripeController {
       // Calculate dynamic end date for subscription (30 days from now)
       const endDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
 
-      await this.prisma.userSubscription.create({
-        data: {
-          userId,
-          planId,
-          endDate,
-          paymentStatus: PaymentStatus.PAID,
-          paymentIntentId,
-          paymentMethod: 'card',
-          paidAt: new Date(),
-          invoiceUrl,
-        },
-      });
-
+      await this.prisma.$transaction([
+        this.prisma.userSubscription.create({
+          data: {
+            userId,
+            planId,
+            endDate,
+            paymentStatus: PaymentStatus.PAID,
+            paymentIntentId,
+            paymentMethod: 'card',
+            paidAt: new Date(),
+            invoiceUrl,
+          },
+        }),
+        this.prisma.user.update({
+          where: { id: userId },
+          data: { isSubscribed: true },
+        }),
+      ]);
+      
       console.log('✅ UserSubscription created for user:', userId);
     }
 
