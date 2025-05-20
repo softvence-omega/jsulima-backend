@@ -23,7 +23,7 @@ model User {
   role             Role               @default(USER)
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
-  isSubscribed     Boolean?
+  isSubscribed     Boolean?           @default(false)
   subscriptions    UserSubscription[] // User can have multiple subscriptions over time
   promoCodes       PromoCode[] // User-created promo codes (if needed)
   resetToken       String? // token for password reset

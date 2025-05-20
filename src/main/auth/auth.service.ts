@@ -45,25 +45,40 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const user = await this.usersService.findByEmail(dto.email);
+    console.log("previous user", user)
     if (!user || !(await bcrypt.compare(dto.password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
+  
     const payload = { sub: user.id, role: user.role };
-
+  
     const jwtSecret = this.configService.get<string>('JWT_ACCESS_SECRET');
     if (!jwtSecret) {
-      console.error('JWT_SECRET is not defined!');
       throw new Error('JWT_SECRET is not defined in the environment variables.');
     }
-
-    // Ensure we pass signOptions if needed
+  
     const accessToken = this.jwtService.sign(payload, {
       secret: jwtSecret,
       expiresIn: this.configService.get<string>('JWT_ACCESS_EXPIRES_IN'),
     });
+  
+    const updatedUser = await this.prisma.user.findUnique({
+      where: { id: user.id },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phoneNumber: true,
+        role: true,
+        isSubscribed: true,
+      },
+    });
+    console.log('✅ User fetched in login:', updatedUser);
 
-    return { access_token: accessToken, user: user };
+  
+    return { access_token: accessToken, user: updatedUser };
   }
+  
 
   async generateTokens(user: any) {
     const payload = {
