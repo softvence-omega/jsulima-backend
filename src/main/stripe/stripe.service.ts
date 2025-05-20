@@ -37,18 +37,44 @@ export class StripeService {
     cancelUrl: string;
     promoCode?: string;
   }) {
+    console.log('Received payload:', {
+      userId,
+      planId,
+      amount,
+      successUrl,
+      cancelUrl,
+      promoCode,
+    });
     let finalAmount = amount;
-
-    // ✅ Apply discount if promo code is valid
+    let finalPromoCode = 'N/A';
+    let discountAmount = 0;
+  
+    // Apply discount if a promo code is provided
     if (promoCode) {
-      const { valid, promo } = await this.promoCodeService.validatePromoCode(promoCode);
-      if (!valid) throw new NotFoundException('Promo code is expired or invalid');
-      finalAmount = amount - promo.discount;
-
-      // Ensure price doesn't go below 0
-      if (finalAmount < 0) finalAmount = 0;
+      console.log('Attempting to apply promo code:', promoCode);
+      try {
+        const { valid, promo } = await this.promoCodeService.validatePromoCode(promoCode);
+        console.log('Promo code validation result:', { valid, discount: promo ? promo.discount : 0 });
+  
+        if (valid && promo) {
+          discountAmount = promo.discount;
+          finalAmount = amount - discountAmount;
+          if (finalAmount < 0) finalAmount = 0;
+          finalPromoCode = promoCode;
+          console.log(`Promo applied. Original amount: ${amount}, Discount: ${discountAmount}, Final amount: ${finalAmount}`);
+        } else {
+          console.warn('Promo code is invalid or expired. No discount applied.');
+          throw new NotFoundException('Promo code is expired or invalid');
+        }
+      } catch (error) {
+        console.error('Error validating promo code:', error.message);
+        throw new NotFoundException('Promo code is expired or invalid');
+      }
+    } else {
+      console.log('No promo code provided. Using full amount:', amount);
     }
-
+  
+    // Create Stripe Checkout Session with the (possibly) discounted amount
     const session = await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -69,15 +95,17 @@ export class StripeService {
       metadata: {
         userId,
         planId,
-        promoCode: promoCode || 'N/A',
+        promoCode: finalPromoCode,
         originalAmount: amount.toString(),
         discountedAmount: finalAmount.toString(),
+        discountApplied: discountAmount.toString(),
       },
     });
-
+    
+    console.log('Stripe checkout session created. Session ID:', session.id);
     return session.url;
   }
-
+  
   async constructWebhookEvent(payload: Buffer, signature: string) {
     const endpointSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
     if (!endpointSecret) {
@@ -100,6 +128,33 @@ export class StripeService {
 
     return response as unknown as Stripe.PaymentIntent & {
       charges: Stripe.ApiList<Stripe.Charge & { invoice?: string | Stripe.Invoice }>;
+    };
+  }
+
+
+  async getCheckoutSessionDetails(sessionId: string) {
+    const session = await this.stripe.checkout.sessions.retrieve(sessionId);
+  
+    if (!session) {
+      throw new Error('Checkout session not found');
+    }
+  
+    const paymentIntent = session.payment_intent
+      ? await this.stripe.paymentIntents.retrieve(session.payment_intent as string)
+      : null;
+  
+    return {
+      amountTotal: session.amount_total ? session.amount_total / 100 : null, // convert from cents to dollars
+      currency: session.currency,
+      status: session.payment_status,
+      promoCode: session.metadata?.promoCode || null,
+      originalAmount: session.metadata?.originalAmount || null,
+      discountedAmount: session.metadata?.discountedAmount || null,
+      userId: session.metadata?.userId || null,
+      planId: session.metadata?.planId || null,
+      paymentIntentId: session.payment_intent,
+      created: session.created,
+      paymentDetails: paymentIntent || null,
     };
   }
 
