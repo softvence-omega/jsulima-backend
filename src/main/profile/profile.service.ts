@@ -9,7 +9,7 @@ export class ProfileService {
   constructor(private prisma: PrismaService) {}
 
   async getMyProfile(user: any) {
-    const userId = user?.sub;
+    const userId = user?.id;
   
     if (!userId) {
       throw new NotFoundException('Invalid or missing user ID');
